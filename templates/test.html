@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+<body>
+<style>
+    .params_header_list {
+        margin-bottom: 5px;
+        width: 53%;
+        height: 32px;
+    }
+
+    .method_span {
+        margin-left: 10px;
+        background: #39c528;
+        border-radius: 20px;
+        color: white;
+        font-size: 13px;
+        padding: 0px 10px;
+    }
+</style>
+
+<div class="container" style="margin-top: 30px;">
+
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label>用例方法名:</label>
+        <input type="text" class="form-control" id="test_function">
+    </div>
+
+    <div class="form-group">
+        <label>用例描述:</label>
+        <input type="text" class="form-control" id="test_name">
+    </div>
+
+    <div class="form-group">
+        <label>API:</label>
+        <input type="text" class="form-control" id="test_api" placeholder="Enter API url">
+    </div>
+
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">method</label>
+        <div class="controls">
+            <label class="radio inline" style="margin-right: 15px">
+                <input type="radio" value="1" checked="checked" name="method"> POST
+            </label>
+            <label class="radio inline" style="margin-right: 15px">
+                <input type="radio" value="2" name="method"> GET
+            </label>
+        </div>
+    </div>
+
+
+    <div class="tab-info">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a href="#Headers-tab" class="nav-link active" role="tab" data-toggle="tab">Headers</a>
+            </li>
+            <li class="nav-item">
+                <a href="#Params-tab" class="nav-link" role="tab" data-toggle="tab">Params</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="Headers-tab">
+                <div class="p-20">
+
+                    <div class="form-inline" style="margin: 10px">
+                        <div class="col-sm-3"><input type="text" class="form-control" id="header_key" placeholder="KEY">
+                        </div>
+                        :
+                        <div class="col-sm-3"><input type="text" class="form-control" id="header_value"
+                                                     placeholder="VALUE"></div>
+
+                        <a class="btn btn-primary" onclick="add_header()">add</a>
+                    </div>
+
+                    <div>
+                        <ul id="header_data"></ul>
+                    </div>
+
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="Params-tab">
+                <div class="p-20">
+                    <div class="form-inline" style="margin: 10px">
+                        <div class="col-sm-3"><input type="text" class="form-control" id="params_key" placeholder="KEY">
+                        </div>
+                        :
+                        <div class="col-sm-3"><input type="text" class="form-control" id="params_value"
+                                                     placeholder="VALUE"></div>
+
+                        <a class="btn btn-primary" onclick="add_params()">add</a>
+                    </div>
+
+                    <div>
+                        <ul id="params_data"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="margin-top: 20px">
+
+    <a class="btn btn-primary" style="color: #ffffff" onclick="add_test()">添加用例</a>
+
+    <div style="margin: 15px">
+        <ul class="list-group" id="test_list"></ul>
+    </div>
+
+    <a class="btn btn-primary" id="generateCode" data-toggle="modal" data-target="#classnameModal"
+       style="color: #ffffff;display: none" >提交生成代码</a>
+
+</div>
+
+
+<div class="modal fade" id="classnameModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">最后一步</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>生成用例类名:</label>
+                    <input type="text" class="form-control" id="class_name">
+                    <small>会生成同名.py文件</small>
+                </div>
+                <div class="form-group">
+                    <label>生成测试报告文件位置:</label>
+                    <input type="text" class="form-control" id="report_file_path">
+                </div>
+                <div class="form-group">
+                    <label>生成测试报告title:</label>
+                    <input type="text" class="form-control" id="report_file_title">
+                </div>
+                 <div class="form-group">
+                    <label>生成测试报告description:</label>
+                    <input type="text" class="form-control" id="report_file_description">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submit()">提交</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/javascript">
+
+    var header = {}, params = {};
+
+    var test_data = {};
+
+    function add_header() {
+        var header_key = $("#header_key").val();
+        var header_value = $("#header_value").val();
+        if (!header_key) {
+            alert('key不能为空');
+            return;
+        }
+
+        header[header_key] = header_value;
+        generateLiHtml('header');
+        $("#header_key").val('');
+        $("#header_value").val('');
+    }
+
+    function add_params() {
+        var params_key = $("#params_key").val();
+        var params_value = $("#params_value").val();
+        if (!params_key) {
+            alert('key不能为空');
+            return;
+        }
+
+        params[params_key] = params_value;
+        generateLiHtml('params');
+        $("#params_key").val('');
+        $("#params_value").val('');
+    }
+
+    function delete_data(key, type) {
+        type == 'params' ? delete params[key] : delete header[key];
+        generateLiHtml(type);
+    }
+
+    function generateLiHtml(type) {
+        var html = '';
+        $.each(type == 'params' ? params : header, function (k, v) {
+            html += '<li class="params_header_list"><span style="margin-right:25px">' + k + ' : ' + v + '</span> <a style="float: right;" class="btn btn-danger btn-sm" onclick="delete_data(\'' + k + '\',\'' + type + '\')">delete</a></li>';
+        });
+        type == 'params' ? $("#params_data").html(html) : $("#header_data").html(html);
+    }
+
+    function add_test() {
+        var
+            test_name = $("#test_name").val(),
+            test_function = $("#test_function").val(),
+            api = $("#test_api").val(),
+            method = $("input[name=method]:checked").val();
+
+        if (!test_function) {
+            alert('用例方法名不能为空');
+            return;
+        }
+        if (!api) {
+            alert('API地址不能为空');
+            return;
+        }
+        test_data[test_function] = {
+            'testcase': test_function, 'url': api, 'method': method == 1 ? 'post' : 'get', 'TestcaseName': test_name,
+            'headers': header, 'data': params
+        };
+        generateTestData();
+        $("#test_name").val('');
+        $("#test_function").val('');
+        $("#test_api").val('');
+        header = {};
+        params = {};
+        generateLiHtml('header');
+        generateLiHtml('params');
+    }
+
+    function deleteTest(test_function) {
+        delete test_data[test_function];
+        generateTestData()
+    }
+
+    function editTest(test_function) {
+        var test = test_data[test_function];
+        $("#test_function").val(test['testcase']);
+        $("#test_api").val(test['url']);
+        $("#test_name").val(test['TestcaseName']);
+        $("input[name=method][value=" + (test['method'] == 'post' ? 1 : 2) + "]").click();
+        header = test.headers;
+        params = test.params;
+        generateLiHtml('header');
+        generateLiHtml('params');
+    }
+
+    function generateTestData() {
+        var html = '';
+        $.each(test_data, function (k, v) {
+            html += '<li class="list-group-item">';
+            html += '<a class="btn btn-danger" style="float: right;color: #FFFFFF;margin:5px" onclick="deleteTest(\'' + k + '\')">删除</a>';
+            html += '<a class="btn btn-primary" style="float: right;color: #FFFFFF;margin:5px" onclick="editTest(\'' + k + '\')">编辑</a>';
+            html += '<h4>' + k + '<span>(' + v.TestcaseName + ')</span></h4>';
+            html += '<p>API: ' + v.url + '<span class="method_span">' + v.method + '</span></p>';
+            html += '<table><tr><td><div style="margin-right: 35px">header:';
+            if (JSON.stringify(v.headers) == "{}") {
+                html += '无';
+            } else {
+                html += '<ul>';
+                $.each(v.headers, function (h_k, h_v) {
+                    html += '<li>' + h_k + ' : ' + h_v + '</li>';
+                });
+                html += '</ul>';
+            }
+            html += '</div></td><td><div style="margin-right: 35px">params:';
+            if (JSON.stringify(v.data) == "{}") {
+                html += '无';
+            } else {
+                html += '<ul>';
+                $.each(v.data, function (p_k, p_v) {
+                    html += '<li>' + p_k + ' : ' + p_v + '</li>';
+                });
+                html += '</ul>';
+            }
+            html += '</div></td></tr></table></li>';
+        });
+        $("#test_list").html(html);
+        html ? $("#generateCode").show() : $("#generateCode").hide();
+    }
+
+    function submit() {
+        if(!$("#class_name").val()){
+            alert('类名不能为空');return;
+        }
+        $.ajax(
+            {
+                url: "/generateCode",
+                data: {
+                    data: JSON.stringify(test_data),
+                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                    classname:$("#class_name").val(),
+                    report_file_path:$("#report_file_path").val(),
+                    report_file_title:$("#report_file_title").val(),
+                    report_file_description:$("#report_file_description").val(),
+                },
+                type: "POST",
+                success: function (res) {
+                    if(res.code == 0){
+                        $("#classnameModal").modal('hide');
+                        Swal.fire({
+                            title: 'success',
+                            html: '已成功生成文件',
+                            timer: 1000,
+                        });
+                    }
+                }
+            }
+        );
+    }
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+
+<script
+        src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
