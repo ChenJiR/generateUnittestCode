@@ -1,15 +1,31 @@
 from string import Template
 
 
+def singleUrlCreate(MethodList):
+    code = Template('''
+        self.${testcase}_url = '${url}'
+    ''')
+
+    string = code.substitute(testcase=MethodList["testcase"], url=MethodList['url'])
+    return string
+
+
+def urlListCreate(MethodParaList):
+    string = ""
+    for MethodPara in MethodParaList:
+        string = string + singleUrlCreate(MethodParaList[MethodPara])
+    return string
+
+
 def singleMethodCreate(MethodList):
     code = Template('''
     def test_${testcase}(self):
         """${testcaseName}"""
         headers = $headers
         data = $data
-        re = requests.$method(url='$url',headers=headers,data=data)
-        json = re.text
-        logging.info('-返回结果'+json+'-')
+        re = requests.$method(url=self.${testcase}_url,headers=headers,data=data)
+        result = re.json()
+        print(result)
     ''')
 
     string = code.substitute(testcase=MethodList["testcase"], testcaseName=MethodList["TestcaseName"],
@@ -55,6 +71,7 @@ from HTMLTestRunner import HTMLTestRunner
 class ${className}(unittest.TestCase):
     
     def setUp(self):
+        ${url_list}
         logging.info('--begin test--')
         
     def tearDown(self):
@@ -76,6 +93,7 @@ if __name__ == "__main__":
 ''')
     fileStr = code.substitute(className=parameters['className'],
                               testsuite=addtestsuit(parameters['testCaseList'], parameters),
+                              url_list=urlListCreate(parameters['testCaseList']),
                               model=methodCreate(parameters['testCaseList']),
                               report_file_path=parameters['report_file_path'] or '',
                               report_file_title=parameters['report_file_title'] or None,
