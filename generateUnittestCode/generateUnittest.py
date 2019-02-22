@@ -23,7 +23,7 @@ def singleMethodCreate(MethodList):
         """${testcaseName}"""
         headers = $headers
         data = $data
-        re = requests.$method(url=self.${testcase}_url,headers=headers,data=data)
+        re = requests.$method(url=self.${testcase}_url, headers=headers, data=data)
         result = re.json()
         print(result)
     ''')
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     ${testsuite}
     now = time.strftime("%Y-%m-%d %H-%M-%S")
-    filename = '${report_file_path}/'+ now + '_result.html'
+    filename = '${report_file_path}/' + now + '_result.html'
     with open(filename, 'wb') as fp:
         runner = HTMLTestRunner(stream=fp,
                                 title='${report_file_title}',
