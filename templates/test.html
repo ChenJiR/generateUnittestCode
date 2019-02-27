@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>自动生成测试代码</title>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -244,7 +244,7 @@
         $("#test_name").val(test['TestcaseName']);
         $("input[name=method][value=" + (test['method'] == 'post' ? 1 : 2) + "]").click();
         header = test.headers;
-        params = test.params;
+        params = test.data;
         generateLiHtml('header');
         generateLiHtml('params');
     }
