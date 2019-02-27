@@ -11,11 +11,6 @@ def test(request):
     return render(request, 'test.html')
 
 
-def test2(request):
-    text = 'sdfasfas'
-    return HttpResponse("<p>" + text + "</p>")
-
-
 def generateCode(request):
     test_data = json.loads(request.POST.get('data'))
     parameters = {
