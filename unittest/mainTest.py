@@ -2,10 +2,10 @@
 import unittest
 import time
 from HTMLTestRunner import HTMLTestRunner
-import testCode.TestCreatGoods as TestCreatGoods
+import testCode.asd as asd
 
 def suite():
-    CreatGoods = unittest.makeSuite(TestCreatGoods.TestCreatGoods)
+    CreatGoods = unittest.makeSuite(asd.asd)
 
     alltest_info = unittest.TestSuite()
     alltest_info.addTest(CreatGoods)

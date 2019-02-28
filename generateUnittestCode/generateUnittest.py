@@ -1,4 +1,5 @@
 from string import Template
+import codecs
 
 
 def singleUrlCreate(MethodList):
@@ -92,13 +93,17 @@ class ${className}(unittest.TestCase):
         pass
     ${model}''')
 
-    fileStr = code.substitute(className=parameters['className'],
+    file_str = code.substitute(className=parameters['className'],
                               testsuite=addtestsuit(parameters['testCaseList'], parameters),
                               url_list=urlListCreate(parameters['testCaseList']),
                               model=methodCreate(parameters['testCaseList']),
                               report_file_path=parameters['report_file_path'] or '',
                               report_file_title=parameters['report_file_title'] or None,
                               report_file_description=parameters['report_file_description'] or None)
-    f = open(generateDirName + '/' + parameters['className'] + ".py", 'w')
-    f.write(fileStr)
+    # f = open(generateDirName + '/' + parameters['className'] + ".py", 'w')
+    # f.write(fileStr)
+    # f.close()
+
+    f = codecs.open(generateDirName + '/' + parameters['className'] + ".py", 'w', 'utf-8')
+    f.write(file_str)
     f.close()
