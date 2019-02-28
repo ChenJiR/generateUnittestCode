@@ -13,3 +13,4 @@
 *.sublime-project
 
 testCodes/*
+report/*
