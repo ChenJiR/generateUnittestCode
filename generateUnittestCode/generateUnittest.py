@@ -23,8 +23,7 @@ def singleMethodCreate(MethodList):
         """${testcaseName}"""
         
         url = self.${testcase}_url
-        ${submitList}
-    ''')
+        ${submitList}''')
 
     string = code.substitute(testcase=MethodList["testcase"], testcaseName=MethodList["TestcaseName"],
                              method=MethodList['method'],
@@ -48,7 +47,8 @@ def singleSubmitCreate(SubmitPara, method):
         re = requests.$method(url=url, headers=headers, data=data)
         result = re.json()
         print(result)
-        ''')
+        self.assertEquals(result['message'], '')
+''')
 
     string = code.substitute(headers=SubmitPara['headers'], data=SubmitPara['params'], method=method)
     return string
@@ -80,33 +80,18 @@ def addtestsuit(MethodParaList, parameters):
 
 # 生成测试用例类函数字符串
 def modelClassCreate(parameters, generateDirName='testCode'):
-    code = Template('''
-import unittest,requests,logging,time
-from HTMLTestRunner import HTMLTestRunner
+    code = Template('''import unittest
+import requests
 
 
 class ${className}(unittest.TestCase):
     
     def setUp(self):
-        ${url_list}
-        logging.info('--begin test--')
-        
+        ${url_list}       
     def tearDown(self):
-        logging.info('--end test--')
-    ${model}    
-if __name__ == "__main__":
+        pass
+    ${model}''')
 
-    suite = unittest.TestSuite()
-    ${testsuite}
-    now = time.strftime("%Y-%m-%d %H-%M-%S")
-    filename = '${report_file_path}/' + now + '_result.html'
-    with open(filename, 'wb') as fp:
-        runner = HTMLTestRunner(stream=fp,
-                                title='${report_file_title}',
-                                description='${report_file_description}'
-                                )
-        runner.run(suite)
-''')
     fileStr = code.substitute(className=parameters['className'],
                               testsuite=addtestsuit(parameters['testCaseList'], parameters),
                               url_list=urlListCreate(parameters['testCaseList']),
