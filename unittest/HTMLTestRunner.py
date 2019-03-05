@@ -878,7 +878,9 @@ class HTMLTestRunner(Template_mixin):
         # tid = (n == 0 and 'p' or 'f') + 't%s.%s' % (cid+1,tid+1)
         # errorCase 独立区分出来
         tid = (n == 2 and 'e' or (n == 1 and 'f' or 'p')) + 't%s.%s' % (cid+1, tid+1)
-        name = t.id().split('.')[-1]
+
+        # name = t.id().split('.')[-1]
+        name = str(t)
         doc = t.shortDescription() or ""
         desc = doc and ('%s: %s' % (name, doc)) or name
         tmpl = has_output and self.REPORT_TEST_WITH_OUTPUT_TMPL or self.REPORT_TEST_NO_OUTPUT_TMPL

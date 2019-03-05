@@ -2,23 +2,21 @@
 import unittest
 import time
 from HTMLTestRunner import HTMLTestRunner
-import testCode.asd as asd
-
-def suite():
-    CreatGoods = unittest.makeSuite(asd.asd)
-
-    alltest_info = unittest.TestSuite()
-    alltest_info.addTest(CreatGoods)
-
-    return alltest_info
+import os
 
 
 if __name__ == "__main__":
+
+    path = os.path.split(os.path.realpath(__file__))[0]
+    case_path = path + "\\..\\testCode\\"
+
     now = time.strftime("%Y-%m-%d %H-%M-%S")
-    filename = '../report/' + now + '_result.html'
+    filename = path + "\\..\\report\\" + now + '_result.html'
+
     with open(filename, 'wb') as fp:
         runner = HTMLTestRunner(stream=fp,
                                 title='info后台接口自动化测试报告',
                                 description='description:'
                                 )
-        runner.run(suite())
+        suit = unittest.defaultTestLoader.discover(case_path, "asd.py")
+        runner.run(suit)
