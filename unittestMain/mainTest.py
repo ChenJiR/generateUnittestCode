@@ -18,5 +18,5 @@ if __name__ == "__main__":
                                 title='info后台接口自动化测试报告',
                                 description='description:'
                                 )
-        suit = unittest.defaultTestLoader.discover(case_path, "asd.py")
+        suit = unittest.defaultTestLoader.discover(case_path, "invitationTest.py")
         runner.run(suit)
