@@ -80,7 +80,8 @@ class tool():
         self.__redis_drive(db)
         return self.__redis.get(key)
 
-    def getRedis(self):
+    def getRedis(self, db=None):
+        self.__redis_drive(db)
         return self.__redis
 
     def get_token(self):
